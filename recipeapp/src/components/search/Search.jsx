@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './search/style.css';
+import '../search/style.css';
 function Search({
   getDataFromSearchComponent,
   apiCalledSuccess,

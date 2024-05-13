@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
-import Search from '../../components/Search';
+import Search from '../../components/search/Search';
 import './styles.css';
 import RecipeItem from '../../components/render/RecipeItem';
 import Favorite from '../../components/favorites/Favorite';
