@@ -1,9 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import Search from '../../components/Search';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react';
+import Search from '../../components/search/Search';
 import './styles.css';
 import RecipeItem from '../../components/render/RecipeItem';
 import Favorite from '../../components/favorites/Favorite';
+import { ThemeContext } from '../../App';
 
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'filterFavorites':
+      return {
+        ...state,
+        filteredValue: action.value,
+      };
+
+    default:
+      return state;
+  }
+};
+
+const initialState = {
+  filteredValue: '',
+};
 function Home() {
   //Loading state
   const [loadingState, setLoadingState] = useState(false);
@@ -13,6 +36,14 @@ function Home() {
 
   //Favorite data state
   const [favorites, setFavorites] = useState([]);
+
+  //State for calling api is successful or not
+  const [apiCalledSuccess, setApiCalledSuccess] = useState(false);
+
+  //use reducer functionality
+  const [filteredState, dispatch] = useReducer(reducer, initialState);
+
+  const { theme } = useContext(ThemeContext);
 
   const getDataFromSearchComponent = (getData) => {
     //Keep the loading state as true before calling the api
@@ -34,6 +65,7 @@ function Home() {
 
         //set the recipes state
         setRecipes(results);
+        setApiCalledSuccess(true);
       }
     }
 
@@ -41,24 +73,38 @@ function Home() {
   };
   // console.log(loadingState, recipes);
 
-  const addToFavorites = (getCurrentRecipeItem) => {
-    // console.log(getCurrentRecipeId);
-    let copyFavorites = [...favorites];
+  //Adding favorite recipes
+  const addToFavorites = useCallback(
+    (getCurrentRecipeItem) => {
+      // console.log(getCurrentRecipeId);
+      let copyFavorites = [...favorites];
 
-    const index = copyFavorites.findIndex(
-      (item) => item.id === getCurrentRecipeItem.id
-    );
-    // console.log(index);
-    if (index === -1) {
-      copyFavorites.push(getCurrentRecipeItem);
-      setFavorites(copyFavorites);
-      //save the favorites in local storage
-      localStorage.setItem('favorites', JSON.stringify(copyFavorites));
-    } else {
-      alert('Item is already present in favorites');
-    }
-  };
+      const index = copyFavorites.findIndex(
+        (item) => item.id === getCurrentRecipeItem.id
+      );
+      // console.log(index);
+      if (index === -1) {
+        copyFavorites.push(getCurrentRecipeItem);
+        setFavorites(copyFavorites);
+        //save the favorites in local storage
+        localStorage.setItem('favorites', JSON.stringify(copyFavorites));
+        window.scrollTo({ top: '0', behavior: 'smooth' });
+      } else {
+        alert('Item is already present in favorites');
+      }
+    },
+    [favorites]
+  );
+
   // console.log(favorites);
+
+  //Removing favorite recipes
+  const removeFromFavorites = (getCurrentId) => {
+    let copyFavorites = [...favorites];
+    copyFavorites = copyFavorites.filter((item) => item.id !== getCurrentId);
+    setFavorites(copyFavorites);
+    localStorage.setItem('favorites', JSON.stringify(copyFavorites));
+  };
 
   //the use effect use here
   useEffect(() => {
@@ -70,17 +116,72 @@ function Home() {
   }, []);
   // console.log(favorites);
 
+  //Filter the favorites
+  const filteredFavoriteItems = favorites.filter((item) =>
+    item.title.toLowerCase().includes(filteredState.filteredValue)
+  );
+  const renderRecipes = useCallback(() => {
+    if (recipes && recipes.length > 0) {
+      return recipes.map((item) => (
+        <RecipeItem
+          addToFavorites={() => addToFavorites(item)}
+          id={item.id}
+          image={item.image}
+          title={item.title}
+        />
+      ));
+    }
+  }, [recipes, addToFavorites]);
   return (
     <div className="home">
-      <Search getDataFromSearchComponent={getDataFromSearchComponent} />
+      <Search
+        getDataFromSearchComponent={getDataFromSearchComponent}
+        apiCalledSuccess={apiCalledSuccess}
+        setApiCalledSuccess={setApiCalledSuccess}
+      />
 
       {/*Show favorites item*/}
       <div className="favorites-wrapper">
-        <h1 className="favorites-title">Favorites</h1>
+        <h1
+          style={theme ? { backgroundColor: '#12343b' } : {}}
+          className="favorites-title"
+        >
+          Favorites
+        </h1>
+
+        <div className="search-favorites">
+          <input
+            onChange={(event) =>
+              dispatch({ type: 'filterFavorites', value: event.target.value })
+            }
+            value={filteredState.filteredValue}
+            type="text"
+            name="searchFavorites"
+            placeholder="Search Favorites here"
+          />
+        </div>
+
         <div className="favorites">
-          {favorites && favorites.length > 0
-            ? favorites.map((item) => (
-                <Favorite id={item.id} image={item.image} title={item.title} />
+          {!filteredFavoriteItems.length && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+              }}
+              className="no-items"
+            >
+              No favorites found
+            </div>
+          )}
+          {filteredFavoriteItems && filteredFavoriteItems.length > 0
+            ? filteredFavoriteItems.map((item) => (
+                <Favorite
+                  removeFromFavorites={() => removeFromFavorites(item.id)}
+                  id={item.id}
+                  image={item.image}
+                  title={item.title}
+                />
               ))
             : null}
         </div>
@@ -95,7 +196,8 @@ function Home() {
 
       {/*Map through all recipes*/}
       <div className="items">
-        {recipes && recipes.length > 0
+        {renderRecipes()}
+        {/* {recipes && recipes.length > 0
           ? recipes.map((item) => (
               <RecipeItem
                 addToFavorites={() => addToFavorites(item)}
@@ -104,8 +206,12 @@ function Home() {
                 title={item.title}
               />
             ))
-          : null}
+          : null} */}
       </div>
+      {/*Map through all recipes*/}
+      {!loadingState && !recipes.length && (
+        <div className="no-items">No Recipes are found</div>
+      )}
     </div>
   );
 }
