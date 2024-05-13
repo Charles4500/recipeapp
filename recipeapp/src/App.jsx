@@ -1,13 +1,14 @@
 
 import './App.css'
+import Home from './pages/homepage/Home';
 
 function App() {
  
 
   return (
-    <>
-      <h1>Hello form react</h1>
-    </>
+    <div className='App'>
+     <Home/>
+    </div>
   )
 }
 
