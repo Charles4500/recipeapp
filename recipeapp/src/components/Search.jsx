@@ -5,7 +5,7 @@ function Search({getDataFromSearchComponent}) {
   function handleInputChange(event){
     const {value} =event.target;
     setInputValue(value)
-    console.log(value);
+    // console.log(value);
   }
   function handleSubmit(event){
     event.preventDefault()
