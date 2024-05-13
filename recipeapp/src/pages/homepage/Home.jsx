@@ -1,8 +1,9 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import Search from '../../components/search/Search';
 import './styles.css';
 import RecipeItem from '../../components/render/RecipeItem';
 import Favorite from '../../components/favorites/Favorite';
+import { ThemeContext } from '../../App';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -35,6 +36,8 @@ function Home() {
 
   //use reducer functionality
   const [filteredState, dispatch] = useReducer(reducer, initialState);
+
+  const { theme } = useContext(ThemeContext);
 
   const getDataFromSearchComponent = (getData) => {
     //Keep the loading state as true before calling the api
@@ -117,7 +120,12 @@ function Home() {
 
       {/*Show favorites item*/}
       <div className="favorites-wrapper">
-        <h1 className="favorites-title">Favorites</h1>
+        <h1
+          style={theme ? { backgroundColor: '#12343b' } : {}}
+          className="favorites-title"
+        >
+          Favorites
+        </h1>
 
         <div className="search-favorites">
           <input

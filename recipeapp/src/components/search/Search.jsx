@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import '../search/style.css';
+import { ThemeContext } from '../../App';
+
 function Search({
   getDataFromSearchComponent,
   apiCalledSuccess,
   setApiCalledSuccess,
 }) {
+  
+  const { theme } = useContext(ThemeContext);
   const [inputValue, setInputValue] = useState('');
+
   function handleInputChange(event) {
     const { value } = event.target;
     setInputValue(value);
@@ -30,7 +35,9 @@ function Search({
         value={inputValue}
         onChange={handleInputChange}
       />
-      <button type="submit">Search</button>
+      <button style={theme ? { backgroundColor: '#12343b' } : {}} type="submit">
+        Search
+      </button>
     </form>
   );
 }
