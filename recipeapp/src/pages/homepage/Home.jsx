@@ -88,6 +88,7 @@ function Home() {
         setFavorites(copyFavorites);
         //save the favorites in local storage
         localStorage.setItem('favorites', JSON.stringify(copyFavorites));
+        window.scrollTo({ top: '0', behavior: 'smooth' });
       } else {
         alert('Item is already present in favorites');
       }
@@ -161,6 +162,18 @@ function Home() {
         </div>
 
         <div className="favorites">
+          {!filteredFavoriteItems.length && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+              }}
+              className="no-items"
+            >
+              No favorites found
+            </div>
+          )}
           {filteredFavoriteItems && filteredFavoriteItems.length > 0
             ? filteredFavoriteItems.map((item) => (
                 <Favorite
@@ -195,6 +208,10 @@ function Home() {
             ))
           : null} */}
       </div>
+      {/*Map through all recipes*/}
+      {!loadingState && !recipes.length && (
+        <div className="no-items">No Recipes are found</div>
+      )}
     </div>
   );
 }
