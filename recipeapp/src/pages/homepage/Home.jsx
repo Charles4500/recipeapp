@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react';
 import Search from '../../components/search/Search';
 import './styles.css';
 import RecipeItem from '../../components/render/RecipeItem';
@@ -68,23 +74,27 @@ function Home() {
   // console.log(loadingState, recipes);
 
   //Adding favorite recipes
-  const addToFavorites = (getCurrentRecipeItem) => {
-    // console.log(getCurrentRecipeId);
-    let copyFavorites = [...favorites];
+  const addToFavorites = useCallback(
+    (getCurrentRecipeItem) => {
+      // console.log(getCurrentRecipeId);
+      let copyFavorites = [...favorites];
 
-    const index = copyFavorites.findIndex(
-      (item) => item.id === getCurrentRecipeItem.id
-    );
-    // console.log(index);
-    if (index === -1) {
-      copyFavorites.push(getCurrentRecipeItem);
-      setFavorites(copyFavorites);
-      //save the favorites in local storage
-      localStorage.setItem('favorites', JSON.stringify(copyFavorites));
-    } else {
-      alert('Item is already present in favorites');
-    }
-  };
+      const index = copyFavorites.findIndex(
+        (item) => item.id === getCurrentRecipeItem.id
+      );
+      // console.log(index);
+      if (index === -1) {
+        copyFavorites.push(getCurrentRecipeItem);
+        setFavorites(copyFavorites);
+        //save the favorites in local storage
+        localStorage.setItem('favorites', JSON.stringify(copyFavorites));
+      } else {
+        alert('Item is already present in favorites');
+      }
+    },
+    [favorites]
+  );
+
   // console.log(favorites);
 
   //Removing favorite recipes
@@ -109,7 +119,18 @@ function Home() {
   const filteredFavoriteItems = favorites.filter((item) =>
     item.title.toLowerCase().includes(filteredState.filteredValue)
   );
-
+  const renderRecipes = useCallback(() => {
+    if (recipes && recipes.length > 0) {
+      return recipes.map((item) => (
+        <RecipeItem
+          addToFavorites={() => addToFavorites(item)}
+          id={item.id}
+          image={item.image}
+          title={item.title}
+        />
+      ));
+    }
+  }, [recipes, addToFavorites]);
   return (
     <div className="home">
       <Search
@@ -162,7 +183,8 @@ function Home() {
 
       {/*Map through all recipes*/}
       <div className="items">
-        {recipes && recipes.length > 0
+        {renderRecipes()}
+        {/* {recipes && recipes.length > 0
           ? recipes.map((item) => (
               <RecipeItem
                 addToFavorites={() => addToFavorites(item)}
@@ -171,7 +193,7 @@ function Home() {
                 title={item.title}
               />
             ))
-          : null}
+          : null} */}
       </div>
     </div>
   );

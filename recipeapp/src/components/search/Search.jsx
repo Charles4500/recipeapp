@@ -25,7 +25,7 @@ function Search({
       setInputValue('');
       setApiCalledSuccess(false);
     }
-  }, [apiCalledSuccess]);
+  }, [apiCalledSuccess,setApiCalledSuccess]);
 
   return (
     <form onSubmit={handleSubmit} className="search">
