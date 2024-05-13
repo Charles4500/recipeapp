@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Search from '../../components/Search';
 import './styles.css';
 import RecipeItem from '../../components/render/RecipeItem';
+import Favorite from '../../components/favorites/Favorite';
+
 function Home() {
   //Loading state
   const [loadingState, setLoadingState] = useState(false);
@@ -38,6 +40,7 @@ function Home() {
     getRecipes();
   };
   // console.log(loadingState, recipes);
+
   const addToFavorites = (getCurrentRecipeItem) => {
     // console.log(getCurrentRecipeId);
     let copyFavorites = [...favorites];
@@ -55,10 +58,34 @@ function Home() {
       alert('Item is already present in favorites');
     }
   };
-  console.log(favorites);
+  // console.log(favorites);
+
+  //the use effect use here
+  useEffect(() => {
+    // console.log('Use effect in work');
+    const extractFavoritesFromLocalStorage = JSON.parse(
+      localStorage.getItem('favorites')
+    );
+    setFavorites(extractFavoritesFromLocalStorage);
+  }, []);
+  // console.log(favorites);
+
   return (
     <div className="home">
       <Search getDataFromSearchComponent={getDataFromSearchComponent} />
+
+      {/*Show favorites item*/}
+      <div className="favorites-wrapper">
+        <h1 className="favorites-title">Favorites</h1>
+        <div className="favorites">
+          {favorites && favorites.length > 0
+            ? favorites.map((item) => (
+                <Favorite id={item.id} image={item.image} title={item.title} />
+              ))
+            : null}
+        </div>
+      </div>
+      {/*Show favorites item*/}
 
       {/*show loading state*/}
 
