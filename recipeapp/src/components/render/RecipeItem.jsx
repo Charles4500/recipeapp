@@ -1,7 +1,7 @@
 import React from 'react';
-
+import '../render/styling.css';
 function RecipeItem(props) {
-  const { id, image, title } = props;
+  const { id, image, title, addToFavorites } = props;
   console.log(props, 'recipes');
   return (
     <div key={id} className="recipe-item">
@@ -9,7 +9,7 @@ function RecipeItem(props) {
         <img src={image} />
       </div>
       <p>{title}</p>
-      <button>Add To Favourites</button>
+      <button onClick={addToFavorites}>Add To Favorites</button>
     </div>
   );
 }

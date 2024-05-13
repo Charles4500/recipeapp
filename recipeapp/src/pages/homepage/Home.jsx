@@ -9,6 +9,9 @@ function Home() {
   //Save results that we receive from the api
   const [recipes, setRecipes] = useState([]);
 
+  //Favorite data state
+  const [favorites, setFavorites] = useState([]);
+
   const getDataFromSearchComponent = (getData) => {
     //Keep the loading state as true before calling the api
     setLoadingState(true);
@@ -34,7 +37,25 @@ function Home() {
 
     getRecipes();
   };
-  console.log(loadingState, recipes);
+  // console.log(loadingState, recipes);
+  const addToFavorites = (getCurrentRecipeItem) => {
+    // console.log(getCurrentRecipeId);
+    let copyFavorites = [...favorites];
+
+    const index = copyFavorites.findIndex(
+      (item) => item.id === getCurrentRecipeItem.id
+    );
+    // console.log(index);
+    if (index === -1) {
+      copyFavorites.push(getCurrentRecipeItem);
+      setFavorites(copyFavorites);
+      //save the favorites in local storage
+      localStorage.setItem('favorites', JSON.stringify(copyFavorites));
+    } else {
+      alert('Item is already present in favorites');
+    }
+  };
+  console.log(favorites);
   return (
     <div className="home">
       <Search getDataFromSearchComponent={getDataFromSearchComponent} />
@@ -49,7 +70,12 @@ function Home() {
       <div className="items">
         {recipes && recipes.length > 0
           ? recipes.map((item) => (
-              <RecipeItem id={item.id} image={item.image} title={item.title} />
+              <RecipeItem
+                addToFavorites={() => addToFavorites(item)}
+                id={item.id}
+                image={item.image}
+                title={item.title}
+              />
             ))
           : null}
       </div>
