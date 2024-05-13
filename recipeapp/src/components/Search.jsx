@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './search/style.css';
-function Search({getDataFromSearchComponent}) {
+function Search({
+  getDataFromSearchComponent,
+  apiCalledSuccess,
+  setApiCalledSuccess,
+}) {
   const [inputValue, setInputValue] = useState('');
-  function handleInputChange(event){
-    const {value} =event.target;
-    setInputValue(value)
+  function handleInputChange(event) {
+    const { value } = event.target;
+    setInputValue(value);
     // console.log(value);
   }
-  function handleSubmit(event){
-    event.preventDefault()
-    getDataFromSearchComponent(inputValue)
+  function handleSubmit(event) {
+    event.preventDefault();
+    getDataFromSearchComponent(inputValue);
   }
-  
+  useEffect(() => {
+    if (apiCalledSuccess) {
+      setInputValue('');
+      setApiCalledSuccess(false);
+    }
+  }, [apiCalledSuccess]);
+
   return (
     <form onSubmit={handleSubmit} className="search">
       <input
