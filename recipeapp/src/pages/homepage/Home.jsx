@@ -48,7 +48,9 @@ function Home() {
       {/*Map through all recipes*/}
       <div className="items">
         {recipes && recipes.length > 0
-          ? recipes.map((item) => <RecipeItem item={item} />)
+          ? recipes.map((item) => (
+              <RecipeItem id={item.id} image={item.image} title={item.title} />
+            ))
           : null}
       </div>
     </div>
